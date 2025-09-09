@@ -9,6 +9,13 @@ pipeline {
     environment {
         MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
     }
+    stages{
+        stage('Detect'){
+            steps{
+                sh 'git --version || echo "git not found on PATH"
+                sh 'env | sort'
+            }
+        }
     
     stages {
         stage('Checkout') {
