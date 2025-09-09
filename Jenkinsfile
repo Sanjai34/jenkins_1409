@@ -12,7 +12,7 @@ pipeline {
     stages{
         stage('Detect'){
             steps{
-                bat 'git --version || echo "git not found on PATH"
+                bat 'git --version || echo "git not found on PATH"'
                 bat 'env | sort'
             }
         }
