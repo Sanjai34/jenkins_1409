@@ -17,7 +17,7 @@ pipeline {
             }
         }
     
-    stages {
+    stages{
         stage('Checkout') {
             steps {
                 echo 'Checking out code from GitHub...'
@@ -181,7 +181,7 @@ pipeline {
         }
     }
     
-    post {
+    stage {
         always {
             echo '🏁 Pipeline execution completed!'
             // Clean workspace but keep the running application
