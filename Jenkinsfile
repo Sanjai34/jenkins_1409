@@ -1,66 +1,110 @@
-pipeline 
+pipeline {
 
-{
-
-    agent any
+    agent { label 'Slave' }
  
-    stages
+    parameters {
 
-    {
+        booleanParam(name: 'SKIP_TEST', defaultValue: false, description: 'Skip the test stage')
 
-        stage ('Build')
+    }
+ 
+    stages {
 
-        {
+        stage('Hello') {
 
-            steps
+            steps {
 
-            {
+                echo 'Hello World'
 
-                echo 'Build App'
-
-            } 
+            }
 
         }
  
-        stage ('Build1')
+        stage('Build') {
 
-        {
+            steps {
 
-            steps
+                echo 'Build Stage'
 
-            {
-
-                echo 'Build1 App'
-
-            } 
+            }
 
         }
+ 
+        stage('Test') {
 
-        stage ('Test')
+            when {
 
-        {
+                expression { return !params.SKIP_TEST }
 
-            steps
+            }
 
-            {
+            steps {
 
-                echo 'Test App'
+                echo 'Test Stage'
+
+            }
+
+        }
+ 
+        stage('Staging') {
+
+            steps {
+
+                echo 'Staging Stage'
+
+            }
+
+        }
+ 
+        stage('Deploy') {
+
+            steps {
+
+                echo 'Deploy Stage'
+
+            }
+
+        }
+ 
+        stage('Post Deploy') {
+
+            steps {
+
+                echo 'Post Deployment Stage'
+
+            }
+
+        }
+ 
+        stage('Prod') {
+
+            steps {
+
+                echo 'Prod Stage'
 
             }
 
         }
 
-        stage ('Deploy')
+    }
+ 
+    post {
 
-        {
+        always {
 
-            steps
+            echo "Build finished"
 
-            {
+        }
 
-                echo 'Deploy App'
+        success {
 
-            }
+            echo "Build completed successfully!"
+
+        }
+
+        failure {
+
+            echo "Build failed!"
 
         }
 
