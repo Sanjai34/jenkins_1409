@@ -21,14 +21,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                bat 'mvn compile'
+                sh 'mvn compile'
             }
         }
         
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                bat 'mvn test'
+                sh 'mvn test'
             }
             post {
                 always {
@@ -42,7 +42,7 @@ pipeline {
         stage('Package') {
             steps {
                 echo 'Packaging the application...'
-                bat 'mvn package -DskipTests'
+                sh 'mvn package -DskipTests'
             }
             post {
                 success {
@@ -56,7 +56,7 @@ pipeline {
         stage('Code Quality Check') {
             steps {
                 echo 'Running code quality checks...'
-                bat 'mvn verify -DskipTests'
+                sh 'mvn verify -DskipTests'
             }
         }
         
@@ -66,7 +66,7 @@ pipeline {
                 script {
                     try {
                         // Stop any existing Java processes
-                        bat '''
+                        sh '''
                             echo "Checking for existing Java processes..."
                             tasklist /fi "imagename eq java.exe" 2>nul
                             echo "Stopping existing Java processes..."
@@ -75,7 +75,7 @@ pipeline {
                         '''
                         
                         // Start the application
-                        bat '''
+                        sh '''
                             echo "Starting the Spring Boot application..."
                             dir target
                             start /b java -jar target\\demo-1.0.0.jar --server.port=8080
@@ -100,7 +100,7 @@ pipeline {
                     
                     while (retryCount < maxRetries && !healthCheckPassed) {
                         try {
-                            bat '''
+                            sh '''
                                 echo "Attempting health check (attempt %RETRY_COUNT%)..."
                                 powershell -Command "& {
                                     try {
@@ -136,7 +136,7 @@ pipeline {
             def endpoints = ['/', '/hello', '/health']
             for (ep in endpoints) {
                 try {
-                    bat """
+                    sh """
                         powershell -Command "& {
                             try {
                                 \$response = Invoke-RestMethod -Uri 'http://localhost:8080${ep}' -TimeoutSec 10
@@ -160,7 +160,7 @@ pipeline {
         stage('Final Verification') {
             steps {
                 echo 'Performing final application verification...'
-                bat '''
+                sh '''
                     echo "Application is running on http://localhost:8080"
                     echo "Available endpoints:"
                     echo "  - http://localhost:8080/"
@@ -181,7 +181,7 @@ pipeline {
             script {
                 try {
                     // Clean up build artifacts but keep target directory
-                    bat 'if exist ".m2" rmdir /s /q .m2'
+                    sh 'if exist ".m2" rmdir /s /q .m2'
                     echo 'Build cache cleaned'
                 } catch (Exception e) {
                     echo "Cleanup warning: ${e.getMessage()}"
@@ -199,7 +199,7 @@ pipeline {
             // Stop application on failure
             script {
                 try {
-                    bat 'taskkill /f /im java.exe 2>nul || echo "No Java processes to kill"'
+                    sh 'taskkill /f /im java.exe 2>nul || echo "No Java processes to kill"'
                     echo 'Stopped application due to pipeline failure'
                 } catch (Exception e) {
                     echo "Failed to stop application: ${e.getMessage()}"
