@@ -21,14 +21,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo '🏗️ Building the application...'
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
                 echo '🧪 Running unit tests...'
-                sh 'mvn test'
+                bat 'mvn test'
             }
             post {
                 always {
@@ -40,7 +40,7 @@ pipeline {
         stage('Package') {
             steps {
                 echo '📦 Packaging the application...'
-                sh 'mvn package -DskipTests'
+                bat 'mvn package -DskipTests'
             }
             post {
                 success {
@@ -53,7 +53,7 @@ pipeline {
         stage('Code Quality Check') {
             steps {
                 echo '🔍 Running code quality checks...'
-                sh 'mvn verify -DskipTests'
+                bat 'mvn verify -DskipTests'
             }
         }
 
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 echo '🚀 Deploying to staging environment...'
                 script {
-                    sh '''
+                    bat '''
                         echo "Checking for existing Java processes..."
                         pgrep -f "demo-1.0.0.jar" || echo "No existing Java processes found"
 
@@ -84,7 +84,7 @@ pipeline {
                 echo '🩺 Performing application health check...'
                 script {
                     retry(5) {
-                        sh '''
+                        bat '''
                             echo "Attempting health check..."
                             curl -f http://localhost:8080/health || exit 1
                         '''
@@ -100,7 +100,7 @@ pipeline {
                 script {
                     def endpoints = ['/health']   // Only test valid endpoints
                     for (ep in endpoints) {
-                        sh """
+                        bat """
                             echo "Testing endpoint ${ep}..."
                             curl -f http://localhost:8080${ep}
                         """
@@ -113,7 +113,7 @@ pipeline {
         stage('Final Verification') {
             steps {
                 echo '🔎 Performing final application verification...'
-                sh '''
+                bat '''
                     echo "Application is running on http://localhost:8080"
                     echo "Available endpoints:"
                     echo "  - http://localhost:8080/health"
@@ -129,7 +129,7 @@ pipeline {
         always {
             echo '🏁 Pipeline execution completed!'
             script {
-                sh 'rm -rf .m2 || true'
+                bat 'rm -rf .m2 || true'
                 echo '🧹 Build cache cleaned'
             }
         }
@@ -142,7 +142,7 @@ pipeline {
             echo '❌ Pipeline failed!'
             echo '🔍 Check the console output above for error details'
             script {
-                sh 'pkill -f "demo-1.0.0.jar" || echo "No Java processes to kill"'
+                bat 'pkill -f "demo-1.0.0.jar" || echo "No Java processes to kill"'
                 echo '🛑 Stopped application due to pipeline failure'
             }
         }
